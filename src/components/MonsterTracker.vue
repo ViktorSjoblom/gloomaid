@@ -1,43 +1,78 @@
 <template>
   <div class="monster-tracker">
     <h1>gloomaid</h1>
-  <button @click="addMonster" class="add-card-button">Add Monster</button>
+    <button @click="addMonster" class="add-card-button">Add monster</button>
     <div class="card-container">
-      <div v-for="(monster, index) in monsters" :key="index" class="card">
-          <label>Name:</label>
+  <div v-for="(monster, index) in monsters" :key="index" class="card">
+        <label>Name:</label>
         <h3 class="card-title">
           <input type="text" v-model="monster.name" class="card-name" />
         </h3>
         <div class="card-info">
           <label>HP:</label>
-          <input type="number" v-model="monster.hp" min="0" class="card-input" />
+          <input
+            type="number"
+            v-model="monster.hp"
+            min="0"
+            class="card-input"
+          />
         </div>
         <div class="card-info">
           <label>Shield:</label>
-          <input type="number" v-model="monster.shields" min="0" class="card-input" />
+          <input
+            type="number"
+            v-model="monster.shields"
+            min="0"
+            class="card-input"
+          />
         </div>
         <div class="status-options">
           <div class="status-option">
             <label>Poisoned:</label>
-            <input type="checkbox" v-model="monster.poisoned" class="status-checkbox" />
+            <input
+              type="checkbox"
+              v-model="monster.poisoned"
+              class="status-checkbox"
+            />
           </div>
           <div class="status-option">
             <label>Disarmed:</label>
-            <input type="checkbox" v-model="monster.disarmed" class="status-checkbox" />
+            <input
+              type="checkbox"
+              v-model="monster.disarmed"
+              class="status-checkbox"
+            />
           </div>
           <div class="status-option">
             <label>Wounded:</label>
-            <input type="checkbox" v-model="monster.wounded" class="status-checkbox" />
+            <input
+              type="checkbox"
+              v-model="monster.wounded"
+              class="status-checkbox"
+            />
           </div>
           <div class="status-option">
             <label>Muddled:</label>
-            <input type="checkbox" v-model="monster.muddled" class="status-checkbox" />
+            <input
+              type="checkbox"
+              v-model="monster.muddled"
+              class="status-checkbox"
+            />
           </div>
           <div class="status-option">
             <label>Stunned:</label>
-            <input type="checkbox" v-model="monster.stunned" class="status-checkbox" />
+            <input
+              type="checkbox"
+              v-model="monster.stunned"
+              class="status-checkbox"
+            />
           </div>
         </div>
+  <div class="damage-input">
+  <input type="number" v-model="damage[index]" placeholder="Damage" />
+  <button style="margin-top:5px" class="inflict-damage-button" @click="inflictDamage(index)">Damage</button>
+  <button style="margin-top:5px" class="inflict-piercing-button" @click="inflictPiercingDamage(index)">Piercing</button>
+</div>
         <button @click="removeMonsterCard(index)" class="remove-card-button">Remove Card</button>
       </div>
     </div>
@@ -51,13 +86,14 @@ export default {
   data() {
     return {
       monsters: [],
+      damage: [],
     };
   },
   methods: {
-     // Add a new monster card
+    // Add a new monster card
     addMonster() {
       this.monsters.push({
-        name: '',
+        name: "",
         hp: 0,
         shield: 0,
         poisoned: false,
@@ -75,30 +111,61 @@ export default {
     removeMonsterCard(index) {
       this.monsters.splice(index, 1);
     },
-   // Save the monster cards to local storage
+    // Save the monster cards to local storage
     saveMonsterCards() {
       // Convert the monsters array to JSON
       const monstersJSON = JSON.stringify(this.monsters);
 
       // Save the JSON string to local storage
-      localStorage.setItem('monsterCards', monstersJSON);
+      localStorage.setItem("monsterCards", monstersJSON);
     },
     // Load the monster cards from local storage
     loadMonsterCards() {
       // Retrieve the JSON string from local storage
-      const monstersJSON = localStorage.getItem('monsterCards');
+      const monstersJSON = localStorage.getItem("monsterCards");
 
       if (monstersJSON) {
         // Parse the JSON string into an array of monsters
         this.monsters = JSON.parse(monstersJSON);
       }
     },
+    inflictDamage(index) {
+  const monster = this.monsters[index];
+  const damage = parseInt(this.damage[index]);
+
+  if (isNaN(damage) || damage <= 0) return;
+
+  if (monster.piercing) {
+    monster.hp -= damage;
+  } else {
+    const remainingDamage = Math.max(0, damage - monster.shields);
+    monster.hp -= remainingDamage;
+  }
+
+  // Reset the damage input for the specific monster card
+  this.damage[index] = '';
+},
+
+
+
+inflictPiercingDamage(index) {
+  const monster = this.monsters[index];
+  const damage = parseInt(this.damage[index]);
+
+  if (isNaN(damage) || damage <= 0) return;
+
+  monster.hp -= damage;
+
+  // Reset the damage input for the specific monster card
+  this.damage[index] = '';
+},
+
+
   },
   mounted() {
     // Load the monster cards when the component is mounted
     this.loadMonsterCards();
   },
-
 
   watch: {
     // Save the monster cards whenever the monsters array changes
@@ -109,7 +176,6 @@ export default {
       deep: true,
     },
   },
-  
 };
 </script>
 
@@ -132,7 +198,7 @@ h1 {
 }
 
 label {
-    font-family: "Roboto", sans-serif;
+  font-family: "Roboto", sans-serif;
 }
 
 .card-container {
@@ -179,7 +245,9 @@ label {
 }
 
 .add-card-button,
-.remove-card-button {
+.remove-card-button,
+.inflict-damage-button,
+.inflict-piercing-button {
   background-color: #313931;
   color: white;
   border: none;
@@ -187,11 +255,19 @@ label {
   font-size: 14px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  width: 116px;
 }
 
 .add-card-button:hover,
 .remove-card-button:hover {
   background-color: #8b3f3f;
+}
+
+.damage-input {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 5px;
 }
 
 @media (max-width: 600px) {
