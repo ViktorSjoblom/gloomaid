@@ -69,10 +69,10 @@
           </div>
         </div>
   <div class="damage-input">
-  <input type="number" v-model="damage[index]" placeholder="Damage" />
-  <button style="margin-top:5px" class="inflict-damage-button" @click="inflictDamage(index)">Damage</button>
-  <input type="number" v-model="piercing[index]" placeholder="Piercing" />
-  <button style="margin-top:5px" class="inflict-piercing-button" @click="inflictPiercingDamage(index)">Piercing</button>
+  <input class="damage-input-field" type="number" v-model="damage[index]" placeholder="Damage" />
+  <button class="inflict-damage-button" @click="inflictDamage(index)">Damage</button>
+  <input class="piercing-input-field" type="number" v-model="piercing[index]" placeholder="Piercing" />
+  <button class="inflict-piercing-button" @click="inflictPiercingDamage(index)">Piercing</button>
 </div>
         <button @click="removeMonsterCard(index)" class="remove-card-button">Remove Card</button>
       </div>
@@ -225,6 +225,7 @@ label {
 
 .card-title {
   margin-top: 0;
+  margin-bottom: 0;
 }
 
 .card-info {
@@ -238,12 +239,19 @@ label {
   border-radius: 5px;
 }
 
-.card-name {
+.card-name,
+.damage-input-field,
+.piercing-input-field {
   font-size: 18px;
   border: 1.5px solid rgb(45, 44, 44);
   border-radius: 5px;
   background-color: transparent;
   width: 100px;
+}
+
+.damage-input-field,
+.piercing-input-field {
+    font-size: 14px;
 }
 
 .add-card-button,
@@ -261,8 +269,15 @@ label {
 }
 
 .add-card-button:hover,
-.remove-card-button:hover {
+.remove-card-button:hover,
+.inflict-damage-button:hover,
+.inflict-piercing-button:hover {
   background-color: #8b3f3f;
+}
+
+.inflict-damage-button,
+.inflict-piercing-button {
+    margin: 5px 0 5px 0;
 }
 
 .damage-input {
