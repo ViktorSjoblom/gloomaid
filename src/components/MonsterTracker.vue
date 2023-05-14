@@ -71,6 +71,7 @@
   <div class="damage-input">
   <input type="number" v-model="damage[index]" placeholder="Damage" />
   <button style="margin-top:5px" class="inflict-damage-button" @click="inflictDamage(index)">Damage</button>
+  <input type="number" v-model="piercing[index]" placeholder="Piercing" />
   <button style="margin-top:5px" class="inflict-piercing-button" @click="inflictPiercingDamage(index)">Piercing</button>
 </div>
         <button @click="removeMonsterCard(index)" class="remove-card-button">Remove Card</button>
@@ -87,6 +88,7 @@ export default {
     return {
       monsters: [],
       damage: [],
+      piercing: [],
     };
   },
   methods: {
@@ -150,11 +152,11 @@ export default {
 
 inflictPiercingDamage(index) {
   const monster = this.monsters[index];
-  const damage = parseInt(this.damage[index]);
+  const piercing = parseInt(this.piercing[index]);
 
-  if (isNaN(damage) || damage <= 0) return;
+  if (isNaN(piercing) || piercing <= 0) return;
 
-  monster.hp -= damage;
+  monster.hp -= piercing;
 
   // Reset the damage input for the specific monster card
   this.damage[index] = '';
