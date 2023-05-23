@@ -1,6 +1,6 @@
 <template>
   <div class="monster-card" :class="{ elite: monster.elite }">
-    <h3 class="monster-name" @click="toggleExpanded">{{ showNameOnly ? monster.name : 'Monster' }}</h3>
+    <h3 class="monster-name" @click="toggleExpanded">{{ showNameOnly ? monster.name : 'Collapse' }}</h3>
     <div v-if="!showNameOnly" class="card-details">
       <div class="form-group">
         <label>Name:</label>
@@ -27,33 +27,30 @@
       </div>
       <div class="form-group">
         <label>Wound:</label>
-        <input v-model="monster.poison" type="checkbox" />
+        <input v-model="monster.wound" type="checkbox" />
+      </div>
+      <div class="form-group">
+        <label>Immobilize:</label>
+        <input v-model="monster.immobilize" type="checkbox" />
       </div>
       <div class="form-group">
         <label>Stun:</label>
-        <input v-model="monster.poison" type="checkbox" />
+        <input v-model="monster.stun" type="checkbox" />
       </div>
       <div class="form-group">
         <label>Muddle:</label>
-        <input v-model="monster.poison" type="checkbox" />
+        <input v-model="monster.muddle" type="checkbox" />
       </div>
       <div class="form-group">
         <label>Disarm:</label>
-        <input v-model="monster.poison" type="checkbox" />
-      </div>
-      <div class="form-group">        <div>
-<label v-for="(status, index) in monster.statuses" :key="index">
-  {{ status }}
-  <input v-model="monster.statuses[index]" type="text" />
-</label>
-        </div>
+        <input v-model="monster.disarm" type="checkbox" />
       </div>
       <div class="form-group">
     <div class="action-row">
       <input v-model="damageAmount" type="number" min="0" placeholder="Damage amount" />
-      <button @click="dealDamage">Deal Damage</button>
+      <button class="button-style" @click="dealDamage">Deal Damage</button>
     </div>
-    <button @click="removeMonster">Remove Monster</button>
+    <button class="button-style remove" @click="removeMonster">Remove Monster</button>
   </div>
     </div>
     </div>
@@ -128,20 +125,68 @@ export default {
 }
 
 .elite {
-  background-color: yellow;
+  background-color: rgb(255, 170, 51);
+}
+
+.elite input {
+    background-color: #313931;
+    color: white;
+}
+
+.elite .number-buttons button {
+    background-color: #313931;
+    color: white;
 }
 
 .name-row {
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 
 .number-buttons {
   display: flex;
   margin-left: 10px;
+  justify-content: center;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 .number-buttons button {
-  margin-right: 5px;
+  margin-right: 10px;
+  border-radius: 15px;
+  border: 1px solid black;
+}
+
+.button-style {
+   background-color: #313931;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+
+.remove {
+    background-color: rgb(255, 87, 51);
+}
+
+.button-style:disabled {
+  pointer-events: none;
+}
+
+.button-style:hover {
+  color: #fff;
+  background-color: #1A1A1A;
+  box-shadow: rgba(0, 0, 0, 0.25) 0 8px 15px;
+  transform: translateY(-2px);
+}
+
+.button-style:active {
+  box-shadow: none;
+  transform: translateY(0);
 }
 </style>

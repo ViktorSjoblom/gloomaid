@@ -2,7 +2,7 @@
   <div class="app">
     <div class="monster-tracker">
       <div class="monster-list">
-        <h2>Monster List</h2>
+         <button @click="createNewMonster" class="create-monster-button">Create monster</button>
         <ul>
           <li v-for="monster in monsters" :key="monster.id">
             <MonsterCard
@@ -11,7 +11,6 @@
             ></MonsterCard>
           </li>
         </ul>
-        <button @click="createNewMonster" class="create-monster-button">Create New Monster</button>
       </div>
     </div>
   </div>
@@ -127,6 +126,10 @@ export default {
   font-size: 18px;
   color: gray;
   margin-top: 50px;
+}
+
+ul {
+  list-style: none;
 }
 
 </style>
