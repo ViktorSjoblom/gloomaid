@@ -1,263 +1,99 @@
 <template>
-  <div class="monster-tracker">
-    <h1>gloomaid</h1>
-    <button @click="addMonster" class="add-card-button">Add monster</button>
-    <div class="card-container">
-  <div v-for="(monster, index) in monsters" :key="index" class="card">
-        <label>Name:</label>
-        <h3 class="card-title">
-          <input type="text" v-model="monster.name" class="card-name" />
-        </h3>
-        <div class="card-info">
-          <label>HP:</label>
-          <input
-            type="number"
-            v-model="monster.hp"
-            min="0"
-            class="card-input"
-          />
-        </div>
-        <div class="card-info">
-          <label>Shield:</label>
-          <input
-            type="number"
-            v-model="monster.shields"
-            min="0"
-            class="card-input"
-          />
-        </div>
-        <div class="status-options">
-          <div class="status-option">
-            <label>Poisoned:</label>
-            <input
-              type="checkbox"
-              v-model="monster.poisoned"
-              class="status-checkbox"
-            />
-          </div>
-          <div class="status-option">
-            <label>Disarmed:</label>
-            <input
-              type="checkbox"
-              v-model="monster.disarmed"
-              class="status-checkbox"
-            />
-          </div>
-          <div class="status-option">
-            <label>Wounded:</label>
-            <input
-              type="checkbox"
-              v-model="monster.wounded"
-              class="status-checkbox"
-            />
-          </div>
-          <div class="status-option">
-            <label>Muddled:</label>
-            <input
-              type="checkbox"
-              v-model="monster.muddled"
-              class="status-checkbox"
-            />
-          </div>
-          <div class="status-option">
-            <label>Stunned:</label>
-            <input
-              type="checkbox"
-              v-model="monster.stunned"
-              class="status-checkbox"
-            />
-          </div>
-        </div>
-  <div class="damage-input">
-  <input class="damage-input-field" type="number" v-model="damage[index]" placeholder="Damage" />
-  <button class="inflict-damage-button" @click="inflictDamage(index)">Damage</button>
-  <input class="piercing-input-field" type="number" v-model="piercing[index]" placeholder="Piercing" />
-  <button class="inflict-piercing-button" @click="inflictPiercingDamage(index)">Piercing</button>
-</div>
-        <button @click="removeMonsterCard(index)" class="remove-card-button">Remove Card</button>
+  <div class="app">
+    <div class="monster-tracker">
+      <div class="monster-list">
+        <h2>Monster List</h2>
+        <ul>
+          <li v-for="monster in monsters" :key="monster.id">
+            <MonsterCard
+              :monster="monster"
+              @remove="removeMonster"
+            ></MonsterCard>
+          </li>
+        </ul>
+        <button @click="createNewMonster" class="create-monster-button">Create New Monster</button>
       </div>
     </div>
   </div>
 </template>
 
-
-
 <script>
+import MonsterCard from './MonsterCard.vue';
+
 export default {
+  components: {
+    MonsterCard,
+  },
   data() {
     return {
       monsters: [],
-      damage: [],
-      piercing: [],
+      selectedMonster: null,
     };
   },
   methods: {
-    // Add a new monster card
-    addMonster() {
-      this.monsters.push({
-        name: "",
+    saveMonsters() {
+      const monsters = JSON.stringify(this.monsters);
+      localStorage.setItem('monsters', monsters);
+    },
+    createNewMonster() {
+      const monster = {
+        id: Date.now(),
+        name: 'Name',
         hp: 0,
-        shield: 0,
+        shields: 0,
         poisoned: false,
         disarmed: false,
         wounded: false,
         muddled: false,
         stunned: false,
-      });
-
-      // Delay the execution of saveMonsterCards using a promise or setTimeout
-      Promise.resolve().then(() => {
-        this.saveMonsterCards();
-      });
+        elite: false,
+      };
+      this.monsters.push(monster);
+      this.saveMonsters();
     },
-    removeMonsterCard(index) {
-      this.monsters.splice(index, 1);
+    removeMonster(id) {
+      this.monsters = this.monsters.filter((monster) => monster.id !== id);
+      this.saveMonsters();
     },
-    // Save the monster cards to local storage
-    saveMonsterCards() {
-      // Convert the monsters array to JSON
-      const monstersJSON = JSON.stringify(this.monsters);
-
-      // Save the JSON string to local storage
-      localStorage.setItem("monsterCards", monstersJSON);
-    },
-    // Load the monster cards from local storage
-    loadMonsterCards() {
-      // Retrieve the JSON string from local storage
-      const monstersJSON = localStorage.getItem("monsterCards");
-
-      if (monstersJSON) {
-        // Parse the JSON string into an array of monsters
-        this.monsters = JSON.parse(monstersJSON);
+    loadMonsters() {
+      const savedMonsters = localStorage.getItem('monsters');
+      if (savedMonsters) {
+        this.monsters = JSON.parse(savedMonsters);
       }
     },
-    inflictDamage(index) {
-  const monster = this.monsters[index];
-  const damage = parseInt(this.damage[index]);
-
-  if (isNaN(damage) || damage <= 0) return;
-
-  if (monster.piercing) {
-    monster.hp -= damage;
-  } else {
-    const remainingDamage = Math.max(0, damage - monster.shields);
-    monster.hp -= remainingDamage;
-  }
-
-  // Reset the damage input for the specific monster card
-  this.damage[index] = '';
-},
-
-
-
-inflictPiercingDamage(index) {
-  const monster = this.monsters[index];
-  const piercing = parseInt(this.piercing[index]);
-
-  if (isNaN(piercing) || piercing <= 0) return;
-
-  monster.hp -= piercing;
-
-  // Reset the damage input for the specific monster card
-  this.damage[index] = '';
-},
-
-
   },
-  mounted() {
-    // Load the monster cards when the component is mounted
-    this.loadMonsterCards();
-  },
-
-  watch: {
-    // Save the monster cards whenever the monsters array changes
-    monsters: {
-      handler() {
-        this.saveMonsterCards();
-      },
-      deep: true,
-    },
+  created() {
+    this.loadMonsters();
   },
 };
 </script>
 
-
-<style>
-@font-face {
-  font-family: "GloomhavenFont";
-  src: url("../fonts/IMMORTAL.ttf");
-}
-
-.monster-tracker {
+<style scoped>
+.app {
   max-width: 800px;
   margin: 0 auto;
   padding: 20px;
 }
 
-h1 {
+.app-title {
   text-align: center;
-  font-family: "GloomhavenFont", sans-serif;
-}
-
-label {
-  font-family: "Roboto", sans-serif;
-}
-
-.card-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-}
-
-.card {
-  width: calc(25% - 20px);
+  font-size: 24px;
   margin-bottom: 20px;
-  background-color: #f9f9f9;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 20px;
-  box-sizing: border-box;
-  margin: 10px;
+}
+
+.monster-tracker {
   display: flex;
-  flex-direction: column;
-  align-items: center;
 }
 
-.card-title {
-  margin-top: 0;
-  margin-bottom: 0;
+.monster-list {
+  flex: 1;
 }
 
-.card-info {
-  margin-top: 10px;
+.monster-list h2 {
+  margin-bottom: 10px;
 }
 
-.card-input {
-  width: 50px;
-  padding: 5px;
-  border: 1.5px solid rgb(45, 44, 44);
-  border-radius: 5px;
-}
-
-.card-name,
-.damage-input-field,
-.piercing-input-field {
-  font-size: 18px;
-  border: 1.5px solid rgb(45, 44, 44);
-  border-radius: 5px;
-  background-color: transparent;
-  width: 100px;
-}
-
-.damage-input-field,
-.piercing-input-field {
-    font-size: 14px;
-}
-
-.add-card-button,
-.remove-card-button,
-.inflict-damage-button,
-.inflict-piercing-button {
+.create-monster-button {
   background-color: #313931;
   color: white;
   border: none;
@@ -265,43 +101,32 @@ label {
   font-size: 14px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  width: 116px;
+  border-radius: 5px;
+  margin-top: 10px;
 }
 
-.add-card-button:hover,
-.remove-card-button:hover,
-.inflict-damage-button:hover,
-.inflict-piercing-button:hover {
-  background-color: #8b3f3f;
+.create-monster-button:hover {
+  background-color: #484f4c;
 }
 
-.inflict-damage-button,
-.inflict-piercing-button {
-    margin: 5px 0 5px 0;
+.monster-details {
+  flex: 2;
+  margin-left: 20px;
 }
 
-.damage-input {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 5px;
+.monster-details h2 {
+  margin-bottom: 10px;
 }
 
-@media (max-width: 600px) {
-  .monster-tracker {
-    text-align: center;
-  }
-
-  .add-card-button {
-    margin-top: 20px;
-  }
-
-  .card-container {
-    flex-direction: column;
-  }
-
-  .card {
-    width: 100%;
-  }
+.selected-monster-card {
+  margin-top: 10px;
 }
+
+.no-monster-selected {
+  text-align: center;
+  font-size: 18px;
+  color: gray;
+  margin-top: 50px;
+}
+
 </style>
