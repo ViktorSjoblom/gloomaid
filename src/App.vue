@@ -31,5 +31,6 @@ h1 {
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 20px;
+  font-family: GloomhavenFont,sans-serif;
 }
 </style>
