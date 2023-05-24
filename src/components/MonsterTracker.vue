@@ -38,8 +38,8 @@ export default {
       const monster = {
         id: Date.now(),
         name: 'Name',
-        hp: 0,
-        shields: 0,
+        hp: '',
+        shields: '',
         poisoned: false,
         disarmed: false,
         wounded: false,

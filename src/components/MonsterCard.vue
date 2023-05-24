@@ -14,12 +14,12 @@
         <input v-model="monster.elite" type="checkbox" />
       </div>
       <div class="form-group">
-        <label>HP:</label>
-        <input v-model="monster.hp" type="number" />
+        <label>Health:</label>
+        <input v-model="monster.hp" type="number" placeholder="Health"/>
       </div>
       <div class="form-group">
         <label>Shield:</label>
-        <input v-model="monster.shield" type="number" />
+        <input v-model="monster.shield" type="number" placeholder="Shield" />
       </div>
       <div class="form-group">
         <label>Poison:</label>
@@ -47,7 +47,7 @@
       </div>
       <div class="form-group">
     <div class="action-row">
-      <input v-model="damageAmount" type="number" min="0" placeholder="Damage amount" />
+      <input v-model="damageAmount" type="number" min="0" placeholder="Damage" />
       <button class="button-style" @click="dealDamage">Deal Damage</button>
     </div>
     <button class="button-style remove" @click="removeMonster">Remove Monster</button>
@@ -67,7 +67,7 @@ export default {
   data() {
     return {
       showNameOnly: false,
-      damageAmount: 0,
+      damageAmount: '',
     };
   },
   methods: {
