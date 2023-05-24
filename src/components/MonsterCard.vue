@@ -75,12 +75,16 @@ export default {
       this.showNameOnly = !this.showNameOnly;
     },
     dealDamage() {
-      const damage = parseInt(this.damageAmount);
-      if (!isNaN(damage)) {
+    const damage = parseInt(this.damageAmount);
+    if (!isNaN(damage)) {
+      if (this.monster.poison) {
+        this.monster.hp -= damage + 1; // Add 1 to the damage if the monster is poisoned
+      } else {
         this.monster.hp -= damage;
-        this.damageAmount = 0;
       }
-    },
+      this.damageAmount = 0;
+    }
+  },
     dealPierceDamage() {
       // Logic for dealing pierce damage to the monster
     },
