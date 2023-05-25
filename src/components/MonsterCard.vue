@@ -50,7 +50,10 @@
       <input v-model="damageAmount" type="number" min="0" placeholder="Damage" />
       <button class="button-style" @click="dealDamage">Deal Damage</button>
     </div>
+    <div style="display:flex;flex-direction:column;">
+    <button class="button-style copy" @click="copyMonster">Copy</button>
     <button class="button-style remove" @click="removeMonster">Remove Monster</button>
+    </div>
   </div>
     </div>
     </div>
@@ -71,6 +74,11 @@ export default {
     };
   },
   methods: {
+    copyMonster() {
+    const copiedMonster = { ...this.monster }; // Create a shallow copy of the monster object
+    copiedMonster.id = Date.now(); // Generate a new ID for the copied monster
+    this.$emit('copy', copiedMonster); // Emit a 'copy' event with the copied monster as the payload
+  },
     toggleExpanded() {
       this.showNameOnly = !this.showNameOnly;
     },
