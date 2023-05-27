@@ -50,6 +50,7 @@
       <input v-model="damageAmount" type="number" min="0" placeholder="Damage" />
       <button class="button-style" @click="dealDamage">Deal Damage</button>
     </div>
+    <!-- Change 1 -->
     <div class="action-row">
       <input v-model="pierceAmount" type="number" min="0" placeholder="Pierce" />
     </div>
@@ -104,9 +105,11 @@ export default {
     if (!isNaN(damage)) {
       if (shieldValue > 0 && playerPierce > 0) {
         const effectiveShield = Math.max(0, shieldValue -= playerPierce);
-        this.monster.hp -= damage - effectiveShield;
+        this.monster.hp -= Math.max(0, damage - effectiveShield);
+      } else if (shieldValue > 0 ){
+        this.monster.hp -= Math.max(0,damage - shieldValue);
       } else {
-        this.monster.hp -= damage - shieldValue;
+        this.monster.hp -= damage;
       }
       if (this.monster.poison) {
         this.monster.hp -= 1; // Add 1 to the damage if the monster is poisoned
