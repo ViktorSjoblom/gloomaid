@@ -50,7 +50,6 @@
       <input v-model="damageAmount" type="number" min="0" placeholder="Damage" />
       <button class="button-style" @click="dealDamage">Deal Damage</button>
     </div>
-    <!-- Change 1 -->
     <div class="action-row">
       <input v-model="pierceAmount" type="number" min="0" placeholder="Pierce" />
     </div>

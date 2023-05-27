@@ -8,6 +8,7 @@
             <MonsterCard
               :monster="monster"
               @remove="removeMonster"
+              @copy="copyMonster"
             ></MonsterCard>
           </li>
         </ul>
@@ -30,6 +31,10 @@ export default {
     };
   },
   methods: {
+    copyMonster(copiedMonster) {
+    this.monsters.push(copiedMonster);
+    this.saveMonsters(); // Save the updated monsters array
+  },
     saveMonsters() {
       const monsters = JSON.stringify(this.monsters);
       localStorage.setItem('monsters', monsters);
