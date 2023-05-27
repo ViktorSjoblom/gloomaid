@@ -50,10 +50,14 @@
       <input v-model="damageAmount" type="number" min="0" placeholder="Damage" />
       <button class="button-style" @click="dealDamage">Deal Damage</button>
     </div>
-     <div class="action-row">
+    <!-- Change 1 -->
+    <div class="action-row">
       <input v-model="pierceAmount" type="number" min="0" placeholder="Pierce" />
     </div>
+    <div style="display:flex;flex-direction:column;">
+    <button class="button-style copy" @click="copyMonster">Copy</button>
     <button class="button-style remove" @click="removeMonster">Remove Monster</button>
+    </div>
   </div>
     </div>
     </div>
@@ -74,10 +78,16 @@ export default {
     };
   },
   methods: {
+    copyMonster() {
+    const copiedMonster = { ...this.monster }; // Create a shallow copy of the monster object
+    copiedMonster.id = Date.now(); // Generate a new ID for the copied monster
+    this.$emit('copy', copiedMonster); // Emit a 'copy' event with the copied monster as the payload
+  },
     toggleExpanded() {
       this.showNameOnly = !this.showNameOnly;
     },
-    dealDamage() {
+   // Change 2
+   /*  dealDamage() {
     const damage = parseInt(this.damageAmount);
     if (!isNaN(damage)) {
       if (this.monster.poison) {
@@ -85,6 +95,24 @@ export default {
       } else {
         this.monster.hp -= damage;
       }
+      if ()
+      this.damageAmount = 0;
+    } */
+    dealDamage() {
+    const damage = parseInt(this.damageAmount);
+    let playerPierce = parseInt(this.pierceAmount);
+    let shieldValue = parseInt(this.monster.shield);
+    if (!isNaN(damage)) {
+      if (shieldValue > 0 && playerPierce > 0) {
+        const effectiveShield = Math.max(0, shieldValue -= playerPierce);
+        this.monster.hp -= damage - effectiveShield;
+      } else {
+        this.monster.hp -= damage - shieldValue;
+      }
+      if (this.monster.poison) {
+        this.monster.hp -= 1; // Add 1 to the damage if the monster is poisoned
+      } 
+      
       this.damageAmount = 0;
     }
   },
