@@ -1,62 +1,75 @@
 <template>
-  <div class="monster-card" :class="{ elite: monster.elite }">
-    <h3 class="monster-name" @click="toggleExpanded">{{ showNameOnly ? monster.name : 'Collapse' }}</h3>
+  <div class="monster-card" :class="{ elite: activeMonster.elite }">
+
+   <div v-if="copies.length > 0" class="tab-container">
+  <div
+    class="tab"
+    v-for="(_, index) in copies"
+    :key="copies[index].id"
+    :class="{ active: copies[index] === activeMonster }"
+    @click="switchTab(copies[index])"
+  >
+    {{ copies[index].name }}
+  </div>
+</div>
+
+    <h3 class="monster-name" @click="toggleExpanded">{{ showNameOnly ? activeMonster.name : 'Collapse' }}</h3>
     <div v-if="!showNameOnly" class="card-details">
       <div class="form-group">
         <label>Name:</label>
-        <input v-model="monster.name" type="text" />
-         <div class="number-buttons">
-    <button v-for="num in 6" :key="num" @click="addNumberToName(num)">{{ num }}</button>
-  </div>
+        <input v-model="activeMonster.name" type="text" placeholder="Name" />
+        <div class="number-buttons">
+          <button v-for="num in 6" :key="num" @click="addNumberToName(num)">{{ num }}</button>
+        </div>
       </div>
-        <div class="form-group">
+      <div class="form-group">
         <label>Elite:</label>
-        <input v-model="monster.elite" type="checkbox" />
+        <input v-model="activeMonster.elite" type="checkbox" />
       </div>
       <div class="form-group">
         <label>Health:</label>
-        <input v-model="monster.hp" type="number" placeholder="Health"/>
+        <input v-model="activeMonster.hp" type="number" placeholder="Health" />
       </div>
       <div class="form-group">
         <label>Shield:</label>
-        <input v-model="monster.shield" type="number" placeholder="Shield" />
+        <input v-model="activeMonster.shield" type="number" placeholder="Shield" />
       </div>
       <div class="form-group">
         <label>Poison:</label>
-        <input v-model="monster.poison" type="checkbox" />
+        <input v-model="activeMonster.poison" type="checkbox" />
       </div>
       <div class="form-group">
         <label>Wound:</label>
-        <input v-model="monster.wound" type="checkbox" />
+        <input v-model="activeMonster.wound" type="checkbox" />
       </div>
       <div class="form-group">
         <label>Immobilize:</label>
-        <input v-model="monster.immobilize" type="checkbox" />
+        <input v-model="activeMonster.immobilize" type="checkbox" />
       </div>
       <div class="form-group">
         <label>Stun:</label>
-        <input v-model="monster.stun" type="checkbox" />
+        <input v-model="activeMonster.stun" type="checkbox" />
       </div>
       <div class="form-group">
         <label>Muddle:</label>
-        <input v-model="monster.muddle" type="checkbox" />
+        <input v-model="activeMonster.muddle" type="checkbox" />
       </div>
       <div class="form-group">
         <label>Disarm:</label>
-        <input v-model="monster.disarm" type="checkbox" />
+        <input v-model="activeMonster.disarm" type="checkbox" />
       </div>
       <div class="form-group">
-    <div class="action-row">
-      <input v-model="damageAmount" type="number" min="0" placeholder="Damage" />
-      <button class="button-style" @click="dealDamage">Deal Damage</button>
-    </div>
-    <div style="display:flex;flex-direction:column;">
-    <button class="button-style copy" @click="copyMonster">Copy</button>
-    <button class="button-style remove" @click="removeMonster">Remove Monster</button>
+        <div class="action-row">
+          <input v-model="damageAmount" type="number" min="0" placeholder="Damage" />
+          <button class="button-style" @click="dealDamage">Deal Damage</button>
+        </div>
+        <div style="display:flex;flex-direction:column;">
+          <button class="button-style copy" @click="copyMonster">Copy</button>
+          <button class="button-style remove" @click="removeMonster">Remove Monster</button>
+        </div>
+      </div>
     </div>
   </div>
-    </div>
-    </div>
 </template>
 
 <script>
@@ -71,53 +84,71 @@ export default {
     return {
       showNameOnly: false,
       damageAmount: '',
+      copies: [],
+      activeMonster: {},
     };
   },
   methods: {
-    copyMonster() {
-    const copiedMonster = { ...this.monster }; // Create a shallow copy of the monster object
-    copiedMonster.id = Date.now(); // Generate a new ID for the copied monster
-    this.$emit('copy', copiedMonster); // Emit a 'copy' event with the copied monster as the payload
-  },
+    switchTab(copy) {
+  this.activeMonster = this.copies.find((c) => c.id === copy.id);
+},
+copyMonster() {
+  const copy = { ...this.monster };
+  copy.id = Date.now();
+  copy.name = this.monster.name; // Set the copied monster's name to the original monster's name
+  copy.isActive = false;
+  if (!this.copies) {
+    this.copies = []; // Initialize the copies array if it's undefined
+  }
+  this.copies.push(copy);
+  if (this.copies.length <= 6) {
+    this.activeTab = this.copies.length - 1;
+  }
+},
+
     toggleExpanded() {
       this.showNameOnly = !this.showNameOnly;
     },
     dealDamage() {
-    const damage = parseInt(this.damageAmount);
-    if (!isNaN(damage)) {
-      if (this.monster.poison) {
-        this.monster.hp -= damage + 1; // Add 1 to the damage if the monster is poisoned
-      } else {
-        this.monster.hp -= damage;
+      const damage = parseInt(this.damageAmount);
+      if (!isNaN(damage)) {
+        if (this.activeMonster.poison) {
+          this.activeMonster.hp -= damage + 1; // Add 1 to the damage if the monster is poisoned
+        } else {
+          this.activeMonster.hp -= damage;
+        }
+        this.damageAmount = 0;
       }
-      this.damageAmount = 0;
-    }
-  },
-    dealPierceDamage() {
-      // Logic for dealing pierce damage to the monster
     },
     addNumberToName(num) {
-      const existingNumber = this.monster.name.match(/\d+/); // Extract existing number from the name
+      const existingNumber = this.activeMonster.name.match(/\d+/); // Extract existing number from the name
       if (existingNumber) {
-        const updatedName = this.monster.name.replace(existingNumber[0], num); // Replace existing number with the new one
-        this.monster.name = updatedName.trim(); // Trim any leading/trailing spaces
+        const updatedName = this.activeMonster.name.replace(existingNumber[0], num); // Replace existing number with the new one
+        this.activeMonster.name = updatedName.trim(); // Trim any leading/trailing spaces
       } else {
-        this.monster.name += ` ${num}`; // Add the new number if there is no existing number
+        this.activeMonster.name += ` ${num}`; // Add the new number if there is no existing number
       }
     },
-     removeMonster() {
-      this.$emit('remove', this.monster.id);
-    },
-  },
-  watch: {
-    monsters: {
-      deep: true,
-      handler() {
-      },
-    },
+removeMonster() {
+  if (this.copies.length === 0) {
+    // Emit the remove event for the original card
+    this.$emit('remove', this.monster.id);
+  } else {
+    const index = this.copies.findIndex((copy) => copy === this.activeMonster);
+    if (index !== -1) {
+      this.copies.splice(index, 1);
+      if (index <= this.activeTab) {
+        this.activeTab--;
+        this.activeMonster = this.copies[this.activeTab];
+      }
+    }
+  }
+}
+
   },
 };
 </script>
+
 
 
 <style scoped>
@@ -126,6 +157,7 @@ export default {
   border-radius: 5px;
   padding: 10px;
   margin-bottom: 10px;
+  position: relative;
 }
 
 .monster-name {
@@ -203,5 +235,25 @@ export default {
 .button-style:active {
   box-shadow: none;
   transform: translateY(0);
+}
+
+.tab-container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.tab {
+  padding: 5px 10px;
+  background-color: #ccc;
+  /* margin-right: 5px; */
+  cursor: pointer;
+  border-radius: 5%;
+}
+
+.tab.active {
+  background-color: #aaa;
 }
 </style>

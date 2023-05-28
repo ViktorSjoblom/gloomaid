@@ -31,30 +31,30 @@ export default {
     };
   },
   methods: {
-    copyMonster(copiedMonster) {
-    this.monsters.push(copiedMonster);
+     copyMonster(copiedMonster) {
+    this.monsters.push(copiedMonster); // Add the copied monster to the monsters array
     this.saveMonsters(); // Save the updated monsters array
   },
     saveMonsters() {
       const monsters = JSON.stringify(this.monsters);
       localStorage.setItem('monsters', monsters);
     },
-    createNewMonster() {
-      const monster = {
-        id: Date.now(),
-        name: 'Name',
-        hp: '',
-        shields: '',
-        poisoned: false,
-        disarmed: false,
-        wounded: false,
-        muddled: false,
-        stunned: false,
-        elite: false,
-      };
-      this.monsters.push(monster);
-      this.saveMonsters();
-    },
+createNewMonster() {
+  const monster = {
+    id: Date.now(),
+    name: 'Name',
+    hp: '',
+    shield: '',
+    poison: false,
+    disarm: false,
+    wound: false,
+    muddle: false,
+    stun: false,
+    elite: false,
+  };
+  this.monsters.push(monster);
+  this.saveMonsters();
+},
     removeMonster(id) {
       this.monsters = this.monsters.filter((monster) => monster.id !== id);
       this.saveMonsters();
