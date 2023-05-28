@@ -59,15 +59,17 @@
         <input v-model="activeMonster.disarm" type="checkbox" />
       </div>
       <div class="form-group">
-        <div class="action-row">
-          <input v-model="damageAmount" type="number" min="0" placeholder="Damage" />
-          <button class="button-style" @click="dealDamage">Deal Damage</button>
-        </div>
-        <div style="display:flex;flex-direction:column;">
-          <button class="button-style copy" @click="copyMonster">Copy</button>
-          <button class="button-style remove" @click="removeMonster">Remove Monster</button>
-        </div>
-      </div>
+    <div class="action-row">
+      <input v-model="damageAmount" type="number" min="0" placeholder="Damage" />
+      <button class="button-style" @click="dealDamage">Deal Damage</button>
+    </div>
+    <!-- Change 1 -->
+    <div class="action-row">
+      <input v-model="pierceAmount" type="number" min="0" placeholder="Pierce" />
+    </div>
+    <div style="display:flex;flex-direction:column;">
+    <button class="button-style copy" @click="copyMonster">Copy</button>
+    <button class="button-style remove" @click="removeMonster">Remove Monster</button>
     </div>
   </div>
 </template>
@@ -109,16 +111,40 @@ copyMonster() {
     toggleExpanded() {
       this.showNameOnly = !this.showNameOnly;
     },
-    dealDamage() {
-      const damage = parseInt(this.damageAmount);
-      if (!isNaN(damage)) {
-        if (this.activeMonster.poison) {
-          this.activeMonster.hp -= damage + 1; // Add 1 to the damage if the monster is poisoned
-        } else {
-          this.activeMonster.hp -= damage;
-        }
-        this.damageAmount = 0;
+   // Change 2
+   /*  dealDamage() {
+    const damage = parseInt(this.damageAmount);
+    if (!isNaN(damage)) {
+      if (this.monster.poison) {
+        this.monster.hp -= damage + 1; // Add 1 to the damage if the monster is poisoned
+      } else {
+        this.monster.hp -= damage;
       }
+      if ()
+      this.damageAmount = 0;
+    } */
+    dealDamage() {
+    const damage = parseInt(this.damageAmount);
+    let playerPierce = parseInt(this.pierceAmount);
+    let shieldValue = parseInt(this.monster.shield);
+    if (!isNaN(damage)) {
+      if (shieldValue > 0 && playerPierce > 0) {
+        const effectiveShield = Math.max(0, shieldValue -= playerPierce);
+        this.monster.hp -= Math.max(0, damage - effectiveShield);
+      } else if (shieldValue > 0 ){
+        this.monster.hp -= Math.max(0,damage - shieldValue);
+      } else {
+        this.monster.hp -= damage;
+      }
+      if (this.monster.poison) {
+        this.monster.hp -= 1; // Add 1 to the damage if the monster is poisoned
+      } 
+      
+      this.damageAmount = 0;
+    }
+  },
+    dealPierceDamage() {
+      // Logic for dealing pierce damage to the monster
     },
     addNumberToName(num) {
       const existingNumber = this.activeMonster.name.match(/\d+/); // Extract existing number from the name
