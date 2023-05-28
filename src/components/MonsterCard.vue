@@ -72,6 +72,8 @@
     <button class="button-style remove" @click="removeMonster">Remove Monster</button>
     </div>
   </div>
+  </div>
+  </div>
 </template>
 
 <script>
