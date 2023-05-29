@@ -1,22 +1,17 @@
 <template>
   <div class="monster-card" :class="{ elite: activeMonster.elite }">
 
-   <div v-if="copies.length > 0" class="tab-container">
-  <div
-    class="tab"
-    v-for="(_, index) in copies"
-    :key="copies[index].id"
-    :class="{ active: copies[index] === activeMonster }"
-    @click="switchTab(copies[index])"
-  >
-    {{ copies[index].name }}
-  </div>
-</div>
+    <div v-if="copies.length > 0" class="tab-container">
+      <div class="tab" v-for="(_, index) in copies" :key="copies[index].id"
+        :class="{ active: copies[index] === activeMonster }" @click="switchTab(copies[index])">
+        {{ copies[index].name }}
+      </div>
+    </div>
 
     <h3 class="monster-name" @click="toggleExpanded">{{ showNameOnly ? activeMonster.name : 'Collapse' }}</h3>
     <div v-if="!showNameOnly" class="card-details">
       <div class="form-group">
-        <label>Name:</label>
+        <!-- <label>Name:</label> -->
         <input v-model="activeMonster.name" type="text" placeholder="Name" />
         <div class="number-buttons">
           <button v-for="num in 6" :key="num" @click="addNumberToName(num)">{{ num }}</button>
@@ -26,12 +21,12 @@
         <label>Elite:</label>
         <input v-model="activeMonster.elite" type="checkbox" />
       </div>
-      <div class="form-group">
-        <label>Health:</label>
+      <div class="form-group" style="padding-bottom:5px;">
+        <!-- <label>Health:</label> -->
         <input v-model="activeMonster.hp" type="number" placeholder="Health" />
       </div>
       <div class="form-group">
-        <label>Shield:</label>
+        <!-- <label>Shield:</label> -->
         <input v-model="activeMonster.shield" type="number" placeholder="Shield" />
       </div>
       <div class="form-group">
@@ -59,20 +54,20 @@
         <input v-model="activeMonster.disarm" type="checkbox" />
       </div>
       <div class="form-group">
-    <div class="action-row">
-      <input v-model="damageAmount" type="number" min="0" placeholder="Damage" />
-      <button class="button-style" @click="dealDamage">Deal Damage</button>
+        <div class="action-row" style="padding-bottom:5px;">
+          <input v-model="damageAmount" type="number" min="0" placeholder="Damage" />
+        </div>
+        <!-- Change 1 -->
+        <div class="action-row">
+          <input v-model="pierceAmount" type="number" min="0" placeholder="Pierce" />
+        </div>
+        <button class="button-style" @click="dealDamage">Deal Damage</button>
+        <div style="display:flex;flex-direction:column;align-items:center;">
+          <button class="button-style copy" @click="copyMonster">Copy</button>
+          <button class="button-style remove" @click="removeMonster">Remove Monster</button>
+        </div>
+      </div>
     </div>
-    <!-- Change 1 -->
-    <div class="action-row">
-      <input v-model="pierceAmount" type="number" min="0" placeholder="Pierce" />
-    </div>
-    <div style="display:flex;flex-direction:column;">
-    <button class="button-style copy" @click="copyMonster">Copy</button>
-    <button class="button-style remove" @click="removeMonster">Remove Monster</button>
-    </div>
-  </div>
-  </div>
   </div>
 </template>
 
@@ -94,21 +89,21 @@ export default {
   },
   methods: {
     switchTab(copy) {
-  this.activeMonster = this.copies.find((c) => c.id === copy.id);
-},
-copyMonster() {
-  const copy = { ...this.activeMonster };
-  copy.id = Date.now();
-  copy.name = this.activeMonster.name; // Set the copied monster's name to the original monster's name
-  copy.isActive = false;
-  if (!this.copies) {
-    this.copies = []; // Initialize the copies array if it's undefined
-  }
-  this.copies.push(copy);
-  if (this.copies.length <= 6) {
-    this.activeTab = this.copies.length - 1;
-  }
-},
+      this.activeMonster = this.copies.find((c) => c.id === copy.id);
+    },
+    copyMonster() {
+      const copy = { ...this.activeMonster };
+      copy.id = Date.now();
+      copy.name = this.activeMonster.name; // Set the copied monster's name to the original monster's name
+      copy.isActive = false;
+      if (!this.copies) {
+        this.copies = []; // Initialize the copies array if it's undefined
+      }
+      this.copies.push(copy);
+      if (this.copies.length <= 6) {
+        this.activeTab = this.copies.length - 1;
+      }
+    },
 
 
     toggleExpanded() {
@@ -116,26 +111,26 @@ copyMonster() {
     },
 
     dealDamage() {
-    const damage = parseInt(this.damageAmount);
-    let playerPierce = parseInt(this.pierceAmount);
-    let shieldValue = parseInt(this.monster.shield);
-    if (!isNaN(damage)) {
-      if (shieldValue > 0 && playerPierce > 0) {
-        const effectiveShield = Math.max(0, shieldValue -= playerPierce);
-        this.monster.hp -= Math.max(0, damage - effectiveShield);
-      } else if (shieldValue > 0 ){
-        this.monster.hp -= Math.max(0,damage - shieldValue);
-      } else {
-        this.monster.hp -= damage;
-      }
-      if (this.monster.poison) {
-        this.monster.hp -= 1; // Add 1 to the damage if the monster is poisoned
-      } 
-      
-      this.damageAmount = 0;
+  const damage = parseInt(this.damageAmount);
+  const playerPierce = parseInt(this.pierceAmount);
+  const shieldValue = parseInt(this.activeMonster.shield);
+  if (!Number.isNaN(damage)) {
+    if (shieldValue > 0 && playerPierce > 0) {
+      const effectiveShield = Math.max(0, shieldValue - playerPierce);
+      this.activeMonster.hp -= Math.max(0, damage - effectiveShield);
+    } else if (shieldValue > 0) {
+      this.activeMonster.hp -= Math.max(0, damage - shieldValue);
+    } else {
+      this.activeMonster.hp -= damage;
     }
-  },
-  
+    if (this.activeMonster.poison) {
+      this.activeMonster.hp -= 1; // Add 1 to the damage if the monster is poisoned
+    }
+
+    this.damageAmount = ''; // Set damageAmount to empty string to clear the input field
+  }
+},
+
     addNumberToName(num) {
       const existingNumber = this.activeMonster.name.match(/\d+/); // Extract existing number from the name
       if (existingNumber) {
@@ -145,21 +140,25 @@ copyMonster() {
         this.activeMonster.name += ` ${num}`; // Add the new number if there is no existing number
       }
     },
-removeMonster() {
-  if (this.copies.length === 0) {
-    // Emit the remove event for the original card
-    this.$emit('remove', this.monster.id);
-  } else {
-    const index = this.copies.findIndex((copy) => copy === this.activeMonster);
-    if (index !== -1) {
-      this.copies.splice(index, 1);
-      if (index <= this.activeTab) {
-        this.activeTab--;
-        this.activeMonster = this.copies[this.activeTab];
+    removeMonster() {
+      if (this.copies.length === 0) {
+        // Emit the remove event for the original card
+        this.$emit('remove', this.monster.id);
+      } else {
+        const index = this.copies.findIndex((copy) => copy === this.activeMonster);
+        if (index !== -1) {
+          this.copies.splice(index, 1);
+          if (index <= this.activeTab) {
+            this.activeTab--;
+          }
+          if (this.activeTab >= 0) {
+            this.activeMonster = this.copies[this.activeTab];
+          } else {
+            this.activeMonster = this.monster;
+          }
+        }
       }
     }
-  }
-}
 
   },
 };
@@ -192,13 +191,13 @@ removeMonster() {
 }
 
 .elite input {
-    background-color: #313931;
-    color: white;
+  background-color: #313931;
+  color: white;
 }
 
 .elite .number-buttons button {
-    background-color: #313931;
-    color: white;
+  background-color: #313931;
+  color: white;
 }
 
 .name-row {
@@ -222,7 +221,7 @@ removeMonster() {
 }
 
 .button-style {
-   background-color: #313931;
+  background-color: #313931;
   color: white;
   border: none;
   padding: 8px 16px;
@@ -231,10 +230,11 @@ removeMonster() {
   transition: background-color 0.3s ease;
   border-radius: 5px;
   margin-top: 10px;
+  width: 140px;
 }
 
 .remove {
-    background-color: rgb(255, 87, 51);
+  background-color: rgb(255, 87, 51);
 }
 
 .button-style:disabled {
@@ -257,8 +257,8 @@ removeMonster() {
   position: absolute;
   top: 0;
   right: 0;
-  display: flex;
   flex-direction: column;
+  display: flex;
 }
 
 .tab {
@@ -267,9 +267,27 @@ removeMonster() {
   /* margin-right: 5px; */
   cursor: pointer;
   border-radius: 5%;
+  flex: 1;
+  white-space: nowrap;
+  /* Prevents the text from wrapping */
+  overflow: hidden;
+  /* Hides the overflowed content */
+  text-overflow: ellipsis;
+  /* Adds an ellipsis (...) when the content overflows */
+  width: 100px;
 }
 
 .tab.active {
   background-color: #aaa;
+}
+
+@media only screen and (max-width: 600px) {
+  .tab-container {
+    right: -65px;
+  }
+
+  .tab {
+    width: 45px;
+  }
 }
 </style>
