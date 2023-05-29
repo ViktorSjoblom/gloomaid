@@ -97,9 +97,9 @@ export default {
   this.activeMonster = this.copies.find((c) => c.id === copy.id);
 },
 copyMonster() {
-  const copy = { ...this.monster };
+  const copy = { ...this.activeMonster };
   copy.id = Date.now();
-  copy.name = this.monster.name; // Set the copied monster's name to the original monster's name
+  copy.name = this.activeMonster.name; // Set the copied monster's name to the original monster's name
   copy.isActive = false;
   if (!this.copies) {
     this.copies = []; // Initialize the copies array if it's undefined
@@ -110,21 +110,11 @@ copyMonster() {
   }
 },
 
+
     toggleExpanded() {
       this.showNameOnly = !this.showNameOnly;
     },
-   // Change 2
-   /*  dealDamage() {
-    const damage = parseInt(this.damageAmount);
-    if (!isNaN(damage)) {
-      if (this.monster.poison) {
-        this.monster.hp -= damage + 1; // Add 1 to the damage if the monster is poisoned
-      } else {
-        this.monster.hp -= damage;
-      }
-      if ()
-      this.damageAmount = 0;
-    } */
+
     dealDamage() {
     const damage = parseInt(this.damageAmount);
     let playerPierce = parseInt(this.pierceAmount);
@@ -145,9 +135,7 @@ copyMonster() {
       this.damageAmount = 0;
     }
   },
-    dealPierceDamage() {
-      // Logic for dealing pierce damage to the monster
-    },
+  
     addNumberToName(num) {
       const existingNumber = this.activeMonster.name.match(/\d+/); // Extract existing number from the name
       if (existingNumber) {
