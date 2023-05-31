@@ -13,6 +13,7 @@
       <div class="form-group">
         <!-- <label>Name:</label> -->
         <input v-model="activeMonster.name" type="text" placeholder="Name" />
+
         <div class="number-buttons">
           <button v-for="num in 6" :key="num" @click="addNumberToName(num)">{{ num }}</button>
         </div>
@@ -89,7 +90,9 @@ export default {
       showNameOnly: false,
       damageAmount: '',
       copies: [],
-      activeMonster: {},
+      activeMonster: {
+        name: "Name"
+      },
     };
   },
   methods: {

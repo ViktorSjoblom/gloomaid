@@ -45,7 +45,7 @@ export default {
 createNewMonster() {
   const monster = {
     id: Date.now(),
-    name: 'Name',
+    name: '',
     hp: '',
     shield: '',
     poison: false,
