@@ -64,6 +64,7 @@
         <button class="button-style" @click="dealDamage">Deal damage</button>
         <div style="display:flex;flex-direction:column;align-items:center;">
           <button class="button-style copy" @click="copyMonster">Copy</button>
+          <button class="button-style end-turn" @click="endTurn">End Turn</button>
           <div class="buttons">
             <button style="margin-right:25px;" class="button-style remove" @click="removeMonster">Remove monster</button>
             <button class="button-style remove" @click="removeAllCopies">Remove all</button>
@@ -92,6 +93,28 @@ export default {
     };
   },
   methods: {
+    endTurn() {
+      // Not sure if this needs to be in the code. Adding this causes the "orignal" one to take 2x dmg instead of 1x.
+    // if (this.activeMonster.wound) {
+    //   this.activeMonster.hp -= 1;
+    // }
+
+    this.activeMonster.immobilize = false;
+    this.activeMonster.stun = false;
+    this.activeMonster.muddle = false;
+    this.activeMonster.disarm = false;
+
+    for (const copy of this.copies) {
+      if (copy.wound) {
+        copy.hp -= 1;
+      }
+
+      copy.immobilize = false;
+      copy.stun = false;
+      copy.muddle = false;
+      copy.disarm = false;
+    }
+  },
     switchTab(copy) {
       this.activeMonster = this.copies.find((c) => c.id === copy.id);
     },
