@@ -2,7 +2,10 @@
   <div class="app">
     <div class="monster-tracker">
       <div class="monster-list">
-         <button @click="createNewMonster" class="create-monster-button">Create monster</button>
+        <div class="button-container">
+          <button @click="createNewMonster" class="create-monster-button">Create monster</button>
+      <button class="create-monster-button remove" @click="removeAllMonsters">Remove monsters</button>
+    </div>
         <ul>
           <li v-for="monster in monsters" :key="monster.id">
             <MonsterCard
@@ -58,6 +61,9 @@ createNewMonster() {
     removeMonster(id) {
       this.monsters = this.monsters.filter((monster) => monster.id !== id);
       this.saveMonsters();
+    },
+    removeAllMonsters() {
+      this.monsters = [];
     },
     loadMonsters() {
       const savedMonsters = localStorage.getItem('monsters');
@@ -138,4 +144,22 @@ ul {
   padding: 0;
 }
 
+.remove {
+  background-color: rgb(255, 87, 51);
+}
+
+.button-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+@media only screen and (max-width: 600px) {
+  .button-container {
+  display: flex;
+  flex-direction: column;
+  width: 60%;
+  /* justify-content: space-between; */
+}
+
+}
 </style>

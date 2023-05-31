@@ -61,10 +61,14 @@
         <div class="action-row">
           <input v-model="pierceAmount" type="number" min="0" placeholder="Pierce" />
         </div>
-        <button class="button-style" @click="dealDamage">Deal Damage</button>
+        <button class="button-style" @click="dealDamage">Deal damage</button>
         <div style="display:flex;flex-direction:column;align-items:center;">
           <button class="button-style copy" @click="copyMonster">Copy</button>
-          <button class="button-style remove" @click="removeMonster">Remove Monster</button>
+          <div class="buttons">
+            <button style="margin-right:25px;" class="button-style remove" @click="removeMonster">Remove monster</button>
+            <button class="button-style remove" @click="removeAllCopies">Remove all</button>
+          </div>
+
         </div>
       </div>
     </div>
@@ -158,8 +162,12 @@ export default {
           }
         }
       }
-    }
-
+    },
+    removeAllCopies() {
+      this.copies = [];
+      this.activeMonster = this.monster;
+      this.$emit('remove', this.monster.id);
+    },
   },
 };
 </script>
@@ -264,21 +272,21 @@ export default {
 .tab {
   padding: 5px 10px;
   background-color: #ccc;
-  /* margin-right: 5px; */
   cursor: pointer;
   border-radius: 5%;
   flex: 1;
   white-space: nowrap;
-  /* Prevents the text from wrapping */
   overflow: hidden;
-  /* Hides the overflowed content */
   text-overflow: ellipsis;
-  /* Adds an ellipsis (...) when the content overflows */
   width: 100px;
 }
 
 .tab.active {
   background-color: #aaa;
+}
+
+.buttons {
+  display: flex;
 }
 
 @media only screen and (max-width: 600px) {
@@ -288,6 +296,15 @@ export default {
 
   .tab {
     width: 45px;
+  }
+
+  .buttons {
+    /* flex-direction: column; */
+    display: block;
+  }
+
+  .buttons button {
+    margin-right: 0px !important;
   }
 }
 </style>
