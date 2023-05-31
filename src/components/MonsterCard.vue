@@ -1,7 +1,7 @@
 <template>
   <div class="monster-card" :class="{ elite: activeMonster.elite }">
 
-    <div v-if="copies.length > 0" class="tab-container">
+    <div v-if="!showNameOnly" class="tab-container">
       <div class="tab" v-for="(_, index) in copies" :key="copies[index].id"
         :class="{ active: copies[index] === activeMonster }" @click="switchTab(copies[index])">
         {{ copies[index].name }}
@@ -138,6 +138,12 @@ export default {
 
     toggleExpanded() {
       this.showNameOnly = !this.showNameOnly;
+
+      if (this.showNameOnly) {
+    this.copies.forEach((copy) => {
+      copy.isActive = false;
+    });
+  }
     },
 
     dealDamage() {
