@@ -57,11 +57,11 @@
         <div class="action-row" style="padding-bottom:5px;">
           <input v-model="damageAmount" type="number" min="0" placeholder="Damage" />
         </div>
-        <!-- Change 1 -->
         <div class="action-row">
           <input v-model="pierceAmount" type="number" min="0" placeholder="Pierce" />
         </div>
         <button class="button-style" @click="dealDamage">Deal Damage</button>
+        <button class="button-style" @click="suffer">Suffer</button>
         <div style="display:flex;flex-direction:column;align-items:center;">
           <button class="button-style copy" @click="copyMonster">Copy</button>
           <button class="button-style remove" @click="removeMonster">Remove Monster</button>
@@ -128,8 +128,16 @@ export default {
     }
 
     this.damageAmount = ''; // Set damageAmount to empty string to clear the input field
+    this.pierceAmount = '';
   }
 },
+    suffer() {
+      const damage = parseInt(this.damageAmount);
+      for (let i = 0; i < this.copies.length; i++) {
+        this.copies[i].hp -= damage;
+      }
+
+    },
 
     addNumberToName(num) {
       const existingNumber = this.activeMonster.name.match(/\d+/); // Extract existing number from the name
