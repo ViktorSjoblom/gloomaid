@@ -2,3 +2,4 @@ Commit message:
 Fixed pierce value not going to 0
 Removed comment
 Fixed suffer
+Fixed heal

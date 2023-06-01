@@ -62,8 +62,11 @@
           <input v-model="pierceAmount" type="number" min="0" placeholder="Pierce" />
         </div>
         <button class="button-style" @click="dealDamage">Deal damage</button>
-        <button class="button-style" @click="suffer">Suffer</button>
-        <div style="display:flex;flex-direction:column;align-items:center;">
+       <div>
+        <button class="button-style suffer" @click="suffer">Suffer</button>
+        <button class="button-style heal" @click="heal">Heal</button>
+       </div>
+        <div style="display:flex;flex-direction:column;align-items:center;">  
           <button class="button-style copy" @click="copyMonster">Copy</button>
           <button class="button-style end-turn" @click="endTurn">End Turn</button>
           <div class="buttons">
@@ -169,11 +172,33 @@ export default {
 },
     suffer() {
       const damage = parseInt(this.damageAmount);
+      if (!isNaN(damage)) {
       for (let i = 0; i < this.copies.length; i++) {
         this.copies[i].hp -= damage;
       }
+      this.damageAmount = '';
+    }
 
     },
+    heal() {
+      const heal = parseInt(this.damageAmount);
+   for (const copy of this.copies) {
+    if (copy.poison || copy.wound) {
+      copy.poison = false;
+      copy.wound = false;
+    } else {
+      if (!isNaN(heal)) {
+      
+        copy.hp += heal;
+      
+    }
+      
+    }
+    this.damageAmount = '';
+    }
+    },
+
+
 
     addNumberToName(num) {
       const existingNumber = this.activeMonster.name.match(/\d+/); // Extract existing number from the name
@@ -279,6 +304,15 @@ export default {
   border-radius: 5px;
   margin-top: 10px;
   width: 140px;
+}
+
+.suffer{
+  background-color: rgb(255, 87, 51);
+  max-width: 70px;
+}
+.heal{
+  background-color: green;
+  max-width: 70px;
 }
 
 .remove {
