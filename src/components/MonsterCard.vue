@@ -1,7 +1,7 @@
 <template>
   <div class="monster-card" :class="{ elite: activeMonster.elite }">
 
-    <div v-if="copies.length > 0" class="tab-container">
+    <div v-if="!showNameOnly" class="tab-container">
       <div class="tab" v-for="(_, index) in copies" :key="copies[index].id"
         :class="{ active: copies[index] === activeMonster }" @click="switchTab(copies[index])">
         {{ copies[index].name }}
@@ -13,6 +13,7 @@
       <div class="form-group">
         <!-- <label>Name:</label> -->
         <input v-model="activeMonster.name" type="text" placeholder="Name" />
+
         <div class="number-buttons">
           <button v-for="num in 6" :key="num" @click="addNumberToName(num)">{{ num }}</button>
         </div>
@@ -60,11 +61,16 @@
         <div class="action-row">
           <input v-model="pierceAmount" type="number" min="0" placeholder="Pierce" />
         </div>
-        <button class="button-style" @click="dealDamage">Deal Damage</button>
+        <button class="button-style" @click="dealDamage">Deal damage</button>
         <button class="button-style" @click="suffer">Suffer</button>
         <div style="display:flex;flex-direction:column;align-items:center;">
           <button class="button-style copy" @click="copyMonster">Copy</button>
-          <button class="button-style remove" @click="removeMonster">Remove Monster</button>
+          <button class="button-style end-turn" @click="endTurn">End Turn</button>
+          <div class="buttons">
+            <button style="margin-right:25px;" class="button-style remove" @click="removeMonster">Remove monster</button>
+            <button class="button-style remove" @click="removeAllCopies">Remove all</button>
+          </div>
+
         </div>
       </div>
     </div>
@@ -84,10 +90,34 @@ export default {
       showNameOnly: false,
       damageAmount: '',
       copies: [],
-      activeMonster: {},
+      activeMonster: {
+        name: "Name"
+      },
     };
   },
   methods: {
+    endTurn() {
+      // Not sure if this needs to be in the code. Adding this causes the "orignal" one to take 2x dmg instead of 1x.
+    // if (this.activeMonster.wound) {
+    //   this.activeMonster.hp -= 1;
+    // }
+
+    this.activeMonster.immobilize = false;
+    this.activeMonster.stun = false;
+    this.activeMonster.muddle = false;
+    this.activeMonster.disarm = false;
+
+    for (const copy of this.copies) {
+      if (copy.wound) {
+        copy.hp -= 1;
+      }
+
+      copy.immobilize = false;
+      copy.stun = false;
+      copy.muddle = false;
+      copy.disarm = false;
+    }
+  },
     switchTab(copy) {
       this.activeMonster = this.copies.find((c) => c.id === copy.id);
     },
@@ -108,6 +138,12 @@ export default {
 
     toggleExpanded() {
       this.showNameOnly = !this.showNameOnly;
+
+      if (this.showNameOnly) {
+    this.copies.forEach((copy) => {
+      copy.isActive = false;
+    });
+  }
     },
 
     dealDamage() {
@@ -166,8 +202,12 @@ export default {
           }
         }
       }
-    }
-
+    },
+    removeAllCopies() {
+      this.copies = [];
+      this.activeMonster = this.monster;
+      this.$emit('remove', this.monster.id);
+    },
   },
 };
 </script>
@@ -272,21 +312,21 @@ export default {
 .tab {
   padding: 5px 10px;
   background-color: #ccc;
-  /* margin-right: 5px; */
   cursor: pointer;
   border-radius: 5%;
   flex: 1;
   white-space: nowrap;
-  /* Prevents the text from wrapping */
   overflow: hidden;
-  /* Hides the overflowed content */
   text-overflow: ellipsis;
-  /* Adds an ellipsis (...) when the content overflows */
   width: 100px;
 }
 
 .tab.active {
   background-color: #aaa;
+}
+
+.buttons {
+  display: flex;
 }
 
 @media only screen and (max-width: 600px) {
@@ -296,6 +336,15 @@ export default {
 
   .tab {
     width: 45px;
+  }
+
+  .buttons {
+    /* flex-direction: column; */
+    display: block;
+  }
+
+  .buttons button {
+    margin-right: 0px !important;
   }
 }
 </style>
