@@ -188,9 +188,10 @@ export default {
       copy.wound = false;
     } else {
       if (!isNaN(heal)) {
-      
         copy.hp += heal;
-      
+        if (copy.hp > copy.maxHp) {
+          copy.hp = copy.maxHp;
+        }
     }
       
     }
@@ -365,11 +366,21 @@ export default {
 
 @media only screen and (max-width: 600px) {
   .tab-container {
-    right: -65px;
+    right: -68px;
   }
 
   .tab {
     width: 45px;
+    padding: 5px 10px;
+    margin-left: 5px;
+  background-color: transparent;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  border-radius: 5px;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   }
 
   .buttons {
