@@ -3,8 +3,9 @@
 
     <div v-if="!showNameOnly" class="tab-container">
       <div class="tab" v-for="(_, index) in copies" :key="copies[index].id"
-        :class="{ active: copies[index] === activeMonster }" @click="switchTab(copies[index])">
-        {{ copies[index].name }}
+      :class="{ active: copies[index] === activeMonster, elite: copies[index].elite }"
+  @click="switchTab(copies[index])">          <div>{{ copies[index].name }}</div>
+          <div>{{ copies[index].hp }}</div>
       </div>
     </div>
 
@@ -56,7 +57,7 @@
       </div>
       <div class="form-group">
         <div class="action-row" style="padding-bottom:5px;">
-          <input v-model="damageAmount" type="number" min="0" placeholder="Damage" />
+          <input v-model="damageAmount" type="number" min="0" placeholder="Damage/Suffer/Heal" />
         </div>
         <div class="action-row">
           <input v-model="pierceAmount" type="number" min="0" placeholder="Pierce" />
@@ -235,6 +236,12 @@ export default {
       this.$emit('remove', this.monster.id);
     },
   },
+  
+  computed: {
+    isElite() {
+    return this.activeMonster && this.activeMonster.elite;
+  },
+  },
 };
 </script>
 
@@ -307,13 +314,15 @@ export default {
   width: 140px;
 }
 
-.suffer{
+.suffer {
   background-color: rgb(255, 87, 51);
-  max-width: 70px;
+  max-width: 65px;
+  margin-right: 5px;
 }
-.heal{
+.heal {
   background-color: green;
-  max-width: 70px;
+  max-width: 65px;
+  margin-left: 5px;
 }
 
 .remove {
@@ -354,6 +363,9 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   width: 100px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid black;
 }
 
 .tab.active {
@@ -362,6 +374,14 @@ export default {
 
 .buttons {
   display: flex;
+}
+
+.tab.elite {
+  background-color: orange;
+}
+
+.tab.active.elite {
+  background-color: rgb(210, 136, 0);
 }
 
 @media only screen and (max-width: 600px) {

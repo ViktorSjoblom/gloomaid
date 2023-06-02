@@ -157,7 +157,7 @@ ul {
   .button-container {
   display: flex;
   flex-direction: column;
-  width: 60%;
+  /* width: 60%; */
   /* justify-content: space-between; */
 }
 
