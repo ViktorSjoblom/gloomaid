@@ -29,8 +29,12 @@ export default {
 }
 #app {
   text-align: center;
-  padding: 20px;
+  padding: 20px 20px 20px 0px;
   font-family: "Roboto", Helvetica, sans-serif;
+}
+
+body {
+  margin: 8px 8px 8px 0px;
 }
 
 h1 {

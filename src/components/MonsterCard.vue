@@ -401,11 +401,12 @@ export default {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-bottom: 1.5px;
   }
 
   .buttons {
-    /* flex-direction: column; */
-    display: block;
+    flex-direction: column;
+    /* display: block; */
   }
 
   .buttons button {
