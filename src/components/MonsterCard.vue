@@ -3,7 +3,7 @@
 
     <div v-if="!showNameOnly" class="tab-container">
       <div class="tab" v-for="(_, index) in copies" :key="copies[index].id"
-      :class="{ active: copies[index] === activeMonster, elite: copies[index].elite }"
+      :class="{ active: copies[index] === activeMonster, elite: copies[index].elite, 'small-tabs': isSmallTabs }"
   @click="switchTab(copies[index])">          <div>{{ copies[index].name }}</div>
           <div>{{ copies[index].hp }}</div>
       </div>
@@ -241,6 +241,9 @@ export default {
     isElite() {
     return this.activeMonster && this.activeMonster.elite;
   },
+  isSmallTabs() {
+    return this.copies.length > 6;
+  },
   },
 };
 </script>
@@ -391,7 +394,7 @@ export default {
 
   .tab {
     width: 45px;
-    padding: 5px 10px;
+    padding: 20px 10px;
     margin-left: 5px;
   background-color: transparent;
   border: 1px solid #ccc;
@@ -401,8 +404,8 @@ export default {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-bottom: 1.5px;
-  }
+  margin-bottom: 20px;
+}
 
   .buttons {
     flex-direction: column;
@@ -411,6 +414,11 @@ export default {
 
   .buttons button {
     margin-right: 0px !important;
+  }
+
+  .small-tabs {
+    padding: 5px 10px;
+    margin-bottom: 1.5px;
   }
 }
 </style>
