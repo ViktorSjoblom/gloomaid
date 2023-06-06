@@ -1,5 +1,5 @@
 <template>
-  <div class="monster-card" :class="{ elite: activeMonster.elite }">
+  <div @click="fetchCollection" class="monster-card" :class="{ elite: activeMonster.elite }">
 
     <div v-if="!showNameOnly" class="tab-container">
       <div class="tab" v-for="(_, index) in copies" :key="copies[index].id"
@@ -82,6 +82,31 @@
 </template>
 
 <script>
+import { initializeApp } from "firebase/app";
+import { getFirestore, collection, getDocs } from "firebase/firestore";
+// import { getDocs } from "https://www.gstatic.com/firebasejs/9.8.4/firebase-firestore.js";
+
+
+const firebaseConfig = {
+  apiKey: "AIzaSyARNY_5dnC8eNpmHi75cAZSPvVPnoIiT_Q",
+  authDomain: "gloomaid-bc137.firebaseapp.com",
+  projectId: "gloomaid-bc137",
+  storageBucket: "gloomaid-bc137.appspot.com",
+  messagingSenderId: "781478935671",
+  appId: "1:781478935671:web:5dfeb723344ba538415a72",
+  measurementId: "G-2QZRX9TTWF"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// // Example: Add a document to a 'monsters' collection
+// db.collection('monsters').add({
+//   name: 'Monster test xaxa',
+//   hp: 100,
+// });
+
+
 export default {
   props: {
     monster: {
@@ -91,6 +116,7 @@ export default {
   },
   data() {
     return {
+      collectionData: [],
       showNameOnly: false,
       damageAmount: '',
       copies: [],
@@ -235,6 +261,12 @@ export default {
       this.activeMonster = this.monster;
       this.$emit('remove', this.monster.id);
     },
+
+    fetchCollection() {
+      const rawData = JSON.parse(JSON.stringify(this.collectionData));
+
+    console.log(rawData[0]);
+  }
   },
   
   computed: {
@@ -245,6 +277,26 @@ export default {
     return this.copies.length > 6;
   },
   },
+
+  mounted() {
+  const collectionRef = collection(db, "monsters"); // Replace "Monsters" with the actual collection name in your Firestore database
+  getDocs(collectionRef)
+    .then((querySnapshot) => {
+      const data = [];
+      querySnapshot.forEach((doc) => {
+        const fetchMonsters = {
+          id: doc.id,
+          ...doc.data()
+        };
+        data.push(fetchMonsters);
+      });
+      this.collectionData = data;
+    })
+    .catch((error) => {
+      console.log("Error getting documents: ", error);
+    });
+}
+
 };
 </script>
 
