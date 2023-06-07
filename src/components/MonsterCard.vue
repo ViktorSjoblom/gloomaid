@@ -1,6 +1,27 @@
 <template>
-  <div @click="fetchCollection" class="monster-card" :class="{ elite: activeMonster.elite }">
 
+<div>
+  <select v-model="selectedMonster">
+    <option value="">Select a monster</option>
+    <option v-for="monster in collectionData" :key="monster.id" :value="monster">{{ monster.name }} {{ monster.level }} {{ monster.isElite }}</option>
+  </select>
+</div>
+
+<div v-if="selectedMonster">
+  <h2>{{ selectedMonster.name }}</h2>
+  <p>Health: {{ selectedMonster.health }}</p>
+  <p>Level: {{ selectedMonster.level }}</p>
+</div>
+<!-- 
+  <div v-for="item in collectionData" :key="item.id">
+  Name: {{ item.name }}
+  Level: {{ item.level }}
+  Health: {{ item.health }}
+  Shield: {{ item.shield }}
+  Elite: {{ item.isElite }}
+</div> -->
+
+  <div @click="fetchCollection" class="monster-card" :class="{ elite: activeMonster.elite }">
     <div v-if="!showNameOnly" class="tab-container">
       <div class="tab" v-for="(_, index) in copies" :key="copies[index].id"
       :class="{ active: copies[index] === activeMonster, elite: copies[index].elite, 'small-tabs': isSmallTabs }"
@@ -84,8 +105,6 @@
 <script>
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
-// import { getDocs } from "https://www.gstatic.com/firebasejs/9.8.4/firebase-firestore.js";
-
 
 const firebaseConfig = {
   apiKey: "AIzaSyARNY_5dnC8eNpmHi75cAZSPvVPnoIiT_Q",
@@ -100,13 +119,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// // Example: Add a document to a 'monsters' collection
-// db.collection('monsters').add({
-//   name: 'Monster test xaxa',
-//   hp: 100,
-// });
-
-
 export default {
   props: {
     monster: {
@@ -116,6 +128,7 @@ export default {
   },
   data() {
     return {
+      selectedMonster: null,
       collectionData: [],
       showNameOnly: false,
       damageAmount: '',
@@ -127,11 +140,6 @@ export default {
   },
   methods: {
     endTurn() {
-      // Not sure if this needs to be in the code. Adding this causes the "orignal" one to take 2x dmg instead of 1x.
-    // if (this.activeMonster.wound) {
-    //   this.activeMonster.hp -= 1;
-    // }
-
     this.activeMonster.immobilize = false;
     this.activeMonster.stun = false;
     this.activeMonster.muddle = false;
@@ -154,10 +162,10 @@ export default {
     copyMonster() {
       const copy = { ...this.activeMonster };
       copy.id = Date.now();
-      copy.name = this.activeMonster.name; // Set the copied monster's name to the original monster's name
+      copy.name = this.activeMonster.name;
       copy.isActive = false;
       if (!this.copies) {
-        this.copies = []; // Initialize the copies array if it's undefined
+        this.copies = [];
       }
       this.copies.push(copy);
       if (this.copies.length <= 6) {
@@ -279,7 +287,7 @@ export default {
   },
 
   mounted() {
-  const collectionRef = collection(db, "monsters"); // Replace "Monsters" with the actual collection name in your Firestore database
+  const collectionRef = collection(db, "monsters");
   getDocs(collectionRef)
     .then((querySnapshot) => {
       const data = [];
@@ -295,6 +303,15 @@ export default {
     .catch((error) => {
       console.log("Error getting documents: ", error);
     });
+},
+
+watch: {
+  selectedMonster(newMonster) {
+    if (newMonster) {
+      // Populate the div with the selected monster's information
+      // You can access the properties like newMonster.health, newMonster.level, etc.
+    }
+  }
 }
 
 };
