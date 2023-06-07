@@ -1,17 +1,27 @@
 <template>
 
 <div>
-  <select v-model="selectedMonster">
-    <option value="">Select a monster</option>
-    <option v-for="monster in collectionData" :key="monster.id" :value="monster">{{ monster.name }} {{ monster.level }} {{ monster.isElite }}</option>
+  <select v-model="selectedMonsterGroup">
+    <option value="">Select a monster group</option>
+    <option v-for="monsterGroup in groupedMonsters" :key="monsterGroup.name" :value="monsterGroup">
+      {{ monsterGroup.name }}
+    </option>
   </select>
 </div>
-
-<div v-if="selectedMonster">
+<div v-if="selectedMonsterGroup">
+  <select v-model="selectedMonster" @change="selectMonster">
+    <option value="">Select a specific version</option>
+    <option v-for="monster in selectedMonsterGroup.monsters" :key="monster.id" :value="monster">
+      {{ monster.name }} (Level: {{ monster.level }}, {{ monster.isElite ? 'Elite' : 'Normal' }})
+    </option>
+  </select>
+</div>
+<!-- <div v-if="selectedMonster">
   <h2>{{ selectedMonster.name }}</h2>
   <p>Health: {{ selectedMonster.health }}</p>
   <p>Level: {{ selectedMonster.level }}</p>
-</div>
+</div> -->
+
 <!-- 
   <div v-for="item in collectionData" :key="item.id">
   Name: {{ item.name }}
@@ -129,16 +139,27 @@ export default {
   data() {
     return {
       selectedMonster: null,
+      selectedMonsterName: '',
+      selectedMonsterGroup: null,
       collectionData: [],
       showNameOnly: false,
       damageAmount: '',
       copies: [],
+      monsters: [],
       activeMonster: {
         name: "Name"
       },
     };
   },
   methods: {
+    selectMonster() {
+    this.selectedMonsterGroup = this.groupedMonsters.find(
+      (group) => group.name === this.selectedMonsterName
+    );
+
+    // Reset the selected monster when changing the monster name
+    this.selectedMonster = null;
+  },
     endTurn() {
     this.activeMonster.immobilize = false;
     this.activeMonster.stun = false;
@@ -274,6 +295,7 @@ export default {
       const rawData = JSON.parse(JSON.stringify(this.collectionData));
 
     console.log(rawData[0]);
+    console.log("selected monster group", this.selectedMonsterGroup)
   }
   },
   
@@ -283,6 +305,26 @@ export default {
   },
   isSmallTabs() {
     return this.copies.length > 6;
+  },
+  groupedMonsters() {
+    if (!this.monsters) {
+      return [];
+    }
+    const groups = {};
+    const uniqueMonsterNames = [];
+    this.collectionData.forEach((monster) => {
+      const groupName = monster.name;
+      if (!groups[groupName]) {
+        groups[groupName] = {
+          name: groupName,
+          monsters: [],
+        };
+        uniqueMonsterNames.push(groupName);
+      }
+      groups[groupName].monsters.push(monster);
+    });
+    
+    return uniqueMonsterNames.map((name) => groups[name]);
   },
   },
 
@@ -303,11 +345,27 @@ export default {
     .catch((error) => {
       console.log("Error getting documents: ", error);
     });
+
+    this.collectionData.sort((a, b) => {
+    // Compare the names of monsters
+    const nameA = a.name.toLowerCase();
+    const nameB = b.name.toLowerCase();
+
+    if (nameA < nameB) {
+      return -1;
+    }
+    if (nameA > nameB) {
+      return 1;
+    }
+    return 0;
+  });
 },
 
 watch: {
   selectedMonster(newMonster) {
     if (newMonster) {
+      newMonster.health
+      newMonster.level
       // Populate the div with the selected monster's information
       // You can access the properties like newMonster.health, newMonster.level, etc.
     }
