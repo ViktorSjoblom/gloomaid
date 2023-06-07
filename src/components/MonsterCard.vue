@@ -1,49 +1,41 @@
 <template>
-
-<div>
-  <select v-model="selectedMonsterGroup">
-    <option value="">Select a monster group</option>
-    <option v-for="monsterGroup in groupedMonsters" :key="monsterGroup.name" :value="monsterGroup">
-      {{ monsterGroup.name }}
-    </option>
-  </select>
-</div>
-<div v-if="selectedMonsterGroup">
-  <select v-model="selectedMonster" @change="selectMonster">
-    <option value="">Select a specific version</option>
-    <option v-for="monster in selectedMonsterGroup.monsters" :key="monster.id" :value="monster">
-      {{ monster.name }} (Level: {{ monster.level }}, {{ monster.isElite ? 'Elite' : 'Normal' }})
-    </option>
-  </select>
-</div>
-<!-- <div v-if="selectedMonster">
+  <div>
+    <select v-model="selectedMonsterGroup">
+      <option :value="null" disabled>Select group</option>
+      <option v-for="monsterGroup in groupedMonsters" :key="monsterGroup.name" :value="monsterGroup">
+        {{ monsterGroup.name }}
+      </option>
+    </select>
+  </div>
+  <div v-if="selectedMonsterGroup">
+    <select v-model="selectedMonster" @change="selectMonster">
+      <option :value="null" disabled>Select monster</option>
+      <option v-for="monster in selectedMonsterGroup.monsters" :key="monster.id" :value="monster">
+        {{ monster.name }} (Level: {{ monster.level }}, {{ monster.isElite ? 'Elite' : 'Normal' }})
+      </option>
+    </select>
+  </div>
+  <div v-if="selectedMonster">
   <h2>{{ selectedMonster.name }}</h2>
-  <p>Health: {{ selectedMonster.health }}</p>
   <p>Level: {{ selectedMonster.level }}</p>
-</div> -->
+  <p>Health: {{ selectedMonster.health }}</p>
+  <p>Shield: {{ selectedMonster.shield }}</p>
+  <!-- Add other desired monster information here -->
+</div>
 
-<!-- 
-  <div v-for="item in collectionData" :key="item.id">
-  Name: {{ item.name }}
-  Level: {{ item.level }}
-  Health: {{ item.health }}
-  Shield: {{ item.shield }}
-  Elite: {{ item.isElite }}
-</div> -->
-
-  <div @click="fetchCollection" class="monster-card" :class="{ elite: activeMonster.elite }">
+  <div class="monster-card" :class="{ elite: activeMonster.elite }">
     <div v-if="!showNameOnly" class="tab-container">
       <div class="tab" v-for="(_, index) in copies" :key="copies[index].id"
-      :class="{ active: copies[index] === activeMonster, elite: copies[index].elite, 'small-tabs': isSmallTabs }"
-  @click="switchTab(copies[index])">          <div>{{ copies[index].name }}</div>
-          <div>{{ copies[index].hp }}</div>
+        :class="{ active: copies[index] === activeMonster, elite: copies[index].elite, 'small-tabs': isSmallTabs }"
+        @click="switchTab(copies[index])">
+        <div>{{ copies[index].name }}</div>
+        <div>{{ copies[index].hp }}</div>
       </div>
     </div>
 
     <h3 class="monster-name" @click="toggleExpanded">{{ showNameOnly ? activeMonster.name : 'Collapse' }}</h3>
     <div v-if="!showNameOnly" class="card-details">
       <div class="form-group">
-        <!-- <label>Name:</label> -->
         <input v-model="activeMonster.name" type="text" placeholder="Name" />
 
         <div class="number-buttons">
@@ -55,11 +47,9 @@
         <input v-model="activeMonster.elite" type="checkbox" />
       </div>
       <div class="form-group" style="padding-bottom:5px;">
-        <!-- <label>Health:</label> -->
         <input v-model="activeMonster.hp" type="number" placeholder="Health" />
       </div>
       <div class="form-group">
-        <!-- <label>Shield:</label> -->
         <input v-model="activeMonster.shield" type="number" placeholder="Shield" />
       </div>
       <div class="form-group">
@@ -94,11 +84,11 @@
           <input v-model="pierceAmount" type="number" min="0" placeholder="Pierce" />
         </div>
         <button class="button-style" @click="dealDamage">Deal damage</button>
-       <div>
-        <button class="button-style suffer" @click="suffer">Suffer</button>
-        <button class="button-style heal" @click="heal">Heal</button>
-       </div>
-        <div style="display:flex;flex-direction:column;align-items:center;">  
+        <div>
+          <button class="button-style suffer" @click="suffer">Suffer</button>
+          <button class="button-style heal" @click="heal">Heal</button>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;">
           <button class="button-style copy" @click="copyMonster">Copy</button>
           <button class="button-style end-turn" @click="endTurn">End Turn</button>
           <div class="buttons">
@@ -140,6 +130,9 @@ export default {
     return {
       selectedMonster: null,
       selectedMonsterName: '',
+      selectedMonsterHealth: '',
+      selectedMonsterShield: '',
+      selectedMonsterLevel: '',
       selectedMonsterGroup: null,
       collectionData: [],
       showNameOnly: false,
@@ -153,30 +146,35 @@ export default {
   },
   methods: {
     selectMonster() {
-    this.selectedMonsterGroup = this.groupedMonsters.find(
-      (group) => group.name === this.selectedMonsterName
-    );
-
-    // Reset the selected monster when changing the monster name
-    this.selectedMonster = null;
-  },
+  if (this.selectedMonsterGroup) {
+    this.selectedMonster = this.selectedMonsterGroup.monsters.find(monster => {
+      this.selectedMonsterLevel = monster.level;
+      this.selectedMonsterHealth = monster.health;
+      this.selectedMonsterShield = monster.shield;
+      this.selectedMonsterName = monster.name;
+      console.log("LEVEL: ",this.selectedMonsterLevel,"HEALTH: ", this.selectedMonsterHealth, "SHIELD: ", this.selectedMonsterShield, "NAME: ", this.selectedMonsterName)
+      return true;
+    });
+    return false;
+  }
+},
     endTurn() {
-    this.activeMonster.immobilize = false;
-    this.activeMonster.stun = false;
-    this.activeMonster.muddle = false;
-    this.activeMonster.disarm = false;
+      this.activeMonster.immobilize = false;
+      this.activeMonster.stun = false;
+      this.activeMonster.muddle = false;
+      this.activeMonster.disarm = false;
 
-    for (const copy of this.copies) {
-      if (copy.wound) {
-        copy.hp -= 1;
+      for (const copy of this.copies) {
+        if (copy.wound) {
+          copy.hp -= 1;
+        }
+
+        copy.immobilize = false;
+        copy.stun = false;
+        copy.muddle = false;
+        copy.disarm = false;
       }
-
-      copy.immobilize = false;
-      copy.stun = false;
-      copy.muddle = false;
-      copy.disarm = false;
-    }
-  },
+    },
     switchTab(copy) {
       this.activeMonster = this.copies.find((c) => c.id === copy.id);
     },
@@ -199,76 +197,75 @@ export default {
       this.showNameOnly = !this.showNameOnly;
 
       if (this.showNameOnly) {
-    this.copies.forEach((copy) => {
-      copy.isActive = false;
-    });
-  }
+        this.copies.forEach((copy) => {
+          copy.isActive = false;
+        });
+      }
     },
 
     dealDamage() {
-  const damage = parseInt(this.damageAmount);
-  const playerPierce = parseInt(this.pierceAmount);
-  const shieldValue = parseInt(this.activeMonster.shield);
-  if (!Number.isNaN(damage)) {
-    if (shieldValue > 0 && playerPierce > 0) {
-      const effectiveShield = Math.max(0, shieldValue - playerPierce);
-      this.activeMonster.hp -= Math.max(0, damage - effectiveShield);
-    } else if (shieldValue > 0) {
-      this.activeMonster.hp -= Math.max(0, damage - shieldValue);
-    } else {
-      this.activeMonster.hp -= damage;
-    }
-    if (this.activeMonster.poison) {
-      this.activeMonster.hp -= 1; // Add 1 to the damage if the monster is poisoned
-    }
+      const damage = parseInt(this.damageAmount);
+      const playerPierce = parseInt(this.pierceAmount);
+      const shieldValue = parseInt(this.activeMonster.shield);
+      if (!Number.isNaN(damage)) {
+        if (shieldValue > 0 && playerPierce > 0) {
+          const effectiveShield = Math.max(0, shieldValue - playerPierce);
+          this.activeMonster.hp -= Math.max(0, damage - effectiveShield);
+        } else if (shieldValue > 0) {
+          this.activeMonster.hp -= Math.max(0, damage - shieldValue);
+        } else {
+          this.activeMonster.hp -= damage;
+        }
+        if (this.activeMonster.poison) {
+          this.activeMonster.hp -= 1;
+        }
 
-    this.damageAmount = ''; // Set damageAmount to empty string to clear the input field
-    this.pierceAmount = '';
-  }
-},
+        this.damageAmount = '';
+        this.pierceAmount = '';
+      }
+    },
     suffer() {
       const damage = parseInt(this.damageAmount);
       if (!isNaN(damage)) {
-      for (let i = 0; i < this.copies.length; i++) {
-        this.copies[i].hp -= damage;
+        for (let i = 0; i < this.copies.length; i++) {
+          this.copies[i].hp -= damage;
+        }
+        this.damageAmount = '';
       }
-      this.damageAmount = '';
-    }
 
     },
     heal() {
       const heal = parseInt(this.damageAmount);
-   for (const copy of this.copies) {
-    if (copy.poison || copy.wound) {
-      copy.poison = false;
-      copy.wound = false;
-    } else {
-      if (!isNaN(heal)) {
-        copy.hp += heal;
-        if (copy.hp > copy.maxHp) {
-          copy.hp = copy.maxHp;
+      for (const copy of this.copies) {
+        if (copy.poison || copy.wound) {
+          copy.poison = false;
+          copy.wound = false;
+        } else {
+          if (!isNaN(heal)) {
+            copy.hp += heal;
+            if (copy.hp > copy.maxHp) {
+              copy.hp = copy.maxHp;
+            }
+          }
+
         }
-    }
-      
-    }
-    this.damageAmount = '';
-    }
+        this.damageAmount = '';
+      }
     },
 
 
 
     addNumberToName(num) {
-      const existingNumber = this.activeMonster.name.match(/\d+/); // Extract existing number from the name
+      const existingNumber = this.activeMonster.name.match(/\d+/);
       if (existingNumber) {
-        const updatedName = this.activeMonster.name.replace(existingNumber[0], num); // Replace existing number with the new one
-        this.activeMonster.name = updatedName.trim(); // Trim any leading/trailing spaces
+        const updatedName = this.activeMonster.name.replace(existingNumber[0], num);
+        this.activeMonster.name = updatedName.trim();
       } else {
-        this.activeMonster.name += ` ${num}`; // Add the new number if there is no existing number
+        this.activeMonster.name += ` ${num}`;
       }
     },
     removeMonster() {
       if (this.copies.length === 0) {
-        // Emit the remove event for the original card
         this.$emit('remove', this.monster.id);
       } else {
         const index = this.copies.findIndex((copy) => copy === this.activeMonster);
@@ -290,87 +287,87 @@ export default {
       this.activeMonster = this.monster;
       this.$emit('remove', this.monster.id);
     },
-
-    fetchCollection() {
-      const rawData = JSON.parse(JSON.stringify(this.collectionData));
-
-    console.log(rawData[0]);
-    console.log("selected monster group", this.selectedMonsterGroup)
-  }
   },
-  
+
   computed: {
-    isElite() {
-    return this.activeMonster && this.activeMonster.elite;
-  },
-  isSmallTabs() {
-    return this.copies.length > 6;
-  },
-  groupedMonsters() {
-    if (!this.monsters) {
-      return [];
+    // eslint-disable-next-line vue/no-dupe-keys
+    selectedMonster() {
+    if (this.selectedMonsterGroup && this.selectedMonster) {
+      return this.selectedMonsterGroup.monsters.find(monster => monster.name === this.selectedMonster.name);
     }
-    const groups = {};
-    const uniqueMonsterNames = [];
-    this.collectionData.forEach((monster) => {
-      const groupName = monster.name;
-      if (!groups[groupName]) {
-        groups[groupName] = {
-          name: groupName,
-          monsters: [],
-        };
-        uniqueMonsterNames.push(groupName);
-      }
-      groups[groupName].monsters.push(monster);
-    });
-    
-    return uniqueMonsterNames.map((name) => groups[name]);
+    return null;
   },
+    isElite() {
+      return this.activeMonster && this.activeMonster.elite;
+    },
+    isSmallTabs() {
+      return this.copies.length > 6;
+    },
+    groupedMonsters() {
+      if (!this.monsters) {
+        return [];
+      }
+      const groups = {};
+      const uniqueMonsterNames = [];
+      this.collectionData.forEach((monster) => {
+        const groupName = monster.name;
+        if (!groups[groupName]) {
+          groups[groupName] = {
+            name: groupName,
+            monsters: [],
+          };
+          uniqueMonsterNames.push(groupName);
+        }
+        groups[groupName].monsters.push(monster);
+      });
+      return uniqueMonsterNames.map((name) => groups[name]);
+    },
   },
 
   mounted() {
-  const collectionRef = collection(db, "monsters");
-  getDocs(collectionRef)
-    .then((querySnapshot) => {
-      const data = [];
-      querySnapshot.forEach((doc) => {
-        const fetchMonsters = {
-          id: doc.id,
-          ...doc.data()
-        };
-        data.push(fetchMonsters);
+    const collectionRef = collection(db, "monsters");
+    getDocs(collectionRef)
+      .then((querySnapshot) => {
+        const data = [];
+        querySnapshot.forEach((doc) => {
+          const fetchMonsters = {
+            id: doc.id,
+            ...doc.data()
+          };
+          data.push(fetchMonsters);
+        });
+        this.collectionData = data;
+      })
+      .catch((error) => {
+        console.log("Error getting documents: ", error);
       });
-      this.collectionData = data;
-    })
-    .catch((error) => {
-      console.log("Error getting documents: ", error);
-    });
 
     this.collectionData.sort((a, b) => {
-    // Compare the names of monsters
-    const nameA = a.name.toLowerCase();
-    const nameB = b.name.toLowerCase();
+      const nameA = a.name.toLowerCase();
+      const nameB = b.name.toLowerCase();
 
-    if (nameA < nameB) {
-      return -1;
-    }
-    if (nameA > nameB) {
-      return 1;
-    }
-    return 0;
-  });
-},
+      if (nameA < nameB) {
+        return -1;
+      }
+      if (nameA > nameB) {
+        return 1;
+      }
+      return 0;
+    });
+  },
 
-watch: {
-  selectedMonster(newMonster) {
+  watch: {
+    selectedMonsterName(newName) {
+    console.log("Selected monster name changed:", newName);
+  },
+  selectedMonsterWatch(newMonster) {
     if (newMonster) {
-      newMonster.health
-      newMonster.level
-      // Populate the div with the selected monster's information
-      // You can access the properties like newMonster.health, newMonster.level, etc.
+      // console.log("newMonster", newMonster)
+      this.selectedMonsterGroup = this.groupedMonsters.find(group => group.monsters.some(monster => monster.name === newMonster.name));
     }
   }
 }
+
 
 };
 </script>
@@ -449,6 +446,7 @@ watch: {
   max-width: 65px;
   margin-right: 5px;
 }
+
 .heal {
   background-color: green;
   max-width: 65px;
@@ -523,16 +521,16 @@ watch: {
     width: 45px;
     padding: 20px 10px;
     margin-left: 5px;
-  background-color: transparent;
-  border: 1px solid #ccc;
-  cursor: pointer;
-  border-radius: 5px;
-  flex: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-bottom: 20px;
-}
+    background-color: transparent;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    border-radius: 5px;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 20px;
+  }
 
   .buttons {
     flex-direction: column;
